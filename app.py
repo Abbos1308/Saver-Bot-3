@@ -11,7 +11,7 @@ from aiogram.filters import Command
 import logging
 import admin
 #import musics
-from loader import bot
+from loader import bot , dp
 from filters import UrlChecker
 from check_user import User_checkMiddleware
 yt_links = [

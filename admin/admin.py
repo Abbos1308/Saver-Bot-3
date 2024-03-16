@@ -4,18 +4,7 @@ from aiogram.fsm.context import FSMContext
 from admin.states import AdminState
 from handlers import cursor , conn
 import  sqlite3
-
-
-db = sqlite3.connect('users.db')
-cursor = conn.cursor()
-cursor.execute('''CREATE TABLE IF NOT EXISTS channels
-                  (id INTEGER PRIMARY KEY AUTOINCREMENT, channel_id INTEGER)''')
-db.commit()
-
-cursor.execute("SELECT channel_id FROM channels")
-result = cursor.fetchall()
-kanallar = [row[0] for row in result]
-
+from channels_db import channel_db
 
 
 async def admin_command(message:types.Message,state=FSMContext):
@@ -39,8 +28,7 @@ async def admin_callbacks(call:types.CallbackQuery,state:FSMContext):
 
     # channel
     if call.data=="add_channel":
-        await message.answer("Kanal ID sini yuboring.")
-        await state.set_state(AdminState.add_channel)
+        pass
 
 async def reklama(message :types.Message,state:FSMContext):
     await message.answer("Reklama yuborish boshlandi.")
@@ -59,10 +47,3 @@ async def reklama(message :types.Message,state:FSMContext):
     await message.answer(f"Reklamalar yuborildi:\n{succed}ta ✅\n{failed}ta ❌")
 
 
-async def adding(message:types.Message,state:FSMContext):
-    channel_id = message.text
-    cursor.execute("INSERT INTO channels (channel_id) VALUES (?)", (channel_id,))
-    db.commit()
-    await message_answer("Kanal qo'shildi")
-    kb = await channels_kb(kanallar)
-    await message.answer("Kanallarni o'chirish",reply_markup=kb.as_markup)

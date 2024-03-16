@@ -1,22 +1,14 @@
-from aiogram import BaseMiddleware
+from aiogram.filters import BaseFilter
 from aiogram.types import InlineKeyboardButton, Update
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from loader import bot
 import sqlite3
-from admin.admin import kanallar
+from channels_db import channel_db
 DEFAULT_RATE_LIMIT = .1
-
-class User_checkMiddleware(BaseMiddleware):
-    def __init__(self, limit=DEFAULT_RATE_LIMIT, key_prefix='antiflood_'):
-        self.rate_limit = limit
-        self.prefix = key_prefix
-        super(User_checkMiddleware, self).__init__()
-
-    async def __call__(self, handler, event: Update, data):
-        if event.message:
-            user_id = event.message.from_user.id
-        elif event.callback_query:
-            user_id = event.callback_query.from_user.id
+kanallar = [-1002113453697]
+class CheckSub(BaseFilter):
+    async def __call__(self, message) -> bool:
+        user_id = message.from_user.id
         k = []
         force = False
         for x in kanallar:
@@ -36,7 +28,6 @@ class User_checkMiddleware(BaseMiddleware):
         builder.add(InlineKeyboardButton(text=text, callback_data="check"))
         builder.adjust(1)
         if force:
-            await bot.send_message(chat_id=user_id, text="Bot to'liq ishlashi uchun kanallarga obuna bo'ling!", reply_markup=builder.as_markup())
+            return True
         else:
-            return await handler(event, data)
-
+            return False
